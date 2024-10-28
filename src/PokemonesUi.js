@@ -10,6 +10,7 @@ import '@pokedex/pokemones-dm/pokemones-dm.js';
 export class PokemonesUi extends BbvaCoreIntlMixin(LitElement) {
   static get properties() {
     return {
+      active: { type: Boolean },
       pokemonData: { type: Array },
       loading: { type: Boolean },
     };
@@ -17,16 +18,9 @@ export class PokemonesUi extends BbvaCoreIntlMixin(LitElement) {
 
   constructor() {
     super();
+    this.active = true;
     this.pokemonData = [];
     this.loading = true;
-  }
-
-  firstUpdated() {
-    // Escuchar el evento 'pokemon-data-loaded' emitido por el componente PokemonesDm
-    this.addEventListener('pokemon-data-loaded', (e) => {
-      this.pokemonData = e.detail; // Asigna los datos recibidos a pokemonData
-      this.loading = false; // Cambia el estado de carga
-    });
   }
 
   static get styles() {
@@ -34,6 +28,13 @@ export class PokemonesUi extends BbvaCoreIntlMixin(LitElement) {
       styles,
       getComponentSharedStyles('pokemones-ui-shared-styles'),
     ];
+  }
+
+  firstUpdated() {
+    this.addEventListener('pokemon-data-loaded', (e) => {
+      this.pokemonData = e.detail; // Actualiza los datos de Pokémon
+      this.loading = false; // Actualiza el estado de carga
+    });
   }
 
   render() {
@@ -60,8 +61,8 @@ export class PokemonesUi extends BbvaCoreIntlMixin(LitElement) {
             </div>
           `}
       </div>
-      <pokemones-dm></pokemones-dm> <!-- Agregar el componente de datos en la UI -->
+      <pokemones-dm></pokemones-dm>
     `;
   }
 }
-customElements.define('pokemones-ui', PokemonesUi);
+
