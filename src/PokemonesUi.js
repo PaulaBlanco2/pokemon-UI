@@ -1,10 +1,28 @@
-import { LitElement, html, css } from 'lit-element';
-import "@bbva-experience-components/bbva-button-default/bbva-button-default.js";
-import "@bbva-experience-components/bbva-type-text/bbva-type-text.js"
+import { LitElement, html } from 'lit-element';
+import { getComponentSharedStyles } from '@bbva-web-components/bbva-core-lit-helpers';
+import styles from './pokemones-ui.css.js';
+import '@bbva-experience-components/bbva-button-default/bbva-button-default.js';
+import '@bbva-experience-components/bbva-type-text/bbva-type-text.js';
+import '@bbva-web-components/bbva-spinner/bbva-spinner.js';
+import {BbvaCoreIntlMixin} from '@bbva-web-components/bbva-core-intl-mixin';
 
-export class PokemonesUi extends LitElement {
+/**
+ * ![LitElement component](https://img.shields.io/badge/litElement-component-blue.svg)
+ *
+ * This component ...
+ *
+ * Example:
+ *
+ * ```html
+ *   <pokemones-ui></pokemones-ui>
+ * ```
+ */
+export class PokemonesUi extends BbvaCoreIntlMixin(LitElement) {
   static get properties() {
     return {
+      /**
+       * Description for property
+       */
       active: { type: Boolean },
       pokemonData: { type: Array },
       loading: { type: Boolean },
@@ -18,11 +36,18 @@ export class PokemonesUi extends LitElement {
     this.loading = true;
   }
 
+  static get styles() {
+    return [
+      styles,
+      getComponentSharedStyles('pokemones-ui-shared-styles'),
+    ];
+  }
+
   async fetchPokemon() {
     try {
       console.log('Iniciando fetch de Pokémon');
-      const response = await fetch('https://pokeapi.co/api/v2/pokemon/');
-      
+      const response = await fetch('https://pokeapi.co/api/v2/pokemon?offset=0&limit=50');
+
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
@@ -53,129 +78,33 @@ export class PokemonesUi extends LitElement {
     }
   }
 
-  static get styles() {
-    return css`
-      :host {
-        display: block;
-        font-family: 'Arial', sans-serif;
-      }
-        .title {
-        text-align: center;
-        font-size: 2rem;
-        color: #333;
-        font-weight: bold;
-        margin-top: 20px;
-        margin-bottom: 10px;
-      }
-  
-      .card-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        padding: 20px;
-        max-height: 80vh;
-        overflow-y: auto;
-        background-color: #f9f9f9;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      }
-  
-      .card-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        padding: 20px;
-        max-height: 80vh;
-        overflow-y: auto;
-        background-color: #f9f9f9;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      }
-  
-      .card {
-        background-color: #ffffff;
-        border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        padding: 15px;
-        margin: 15px;
-        text-align: center;
-        transition: transform 0.3s, box-shadow 0.3s;
-        width: 240px;
-        position: relative;
-        overflow: hidden;
-        border: 2px solid transparent;
-        font-weight: bold;
-        color: #444;
-        font-size: 1.1rem;
-      }
-  
-      .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        border-color: #ffcc00; /* Color dorado al hacer hover */
-      }
-  
-      img {
-        border-radius: 10px;
-        max-width: 100%;
-        height: auto;
-        margin-bottom: 10px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      }
-  
-      h3 {
-        margin: 10px 0;
-        font-size: 1.5rem; /* Aumentado para mayor prominencia */
-        color: #333;
-      }
-  
-      p {
-        color: #555;
-        font-size: 0.95rem;
-        margin: 5px 0; /* Espacio para mayor claridad */
-      }
-  
-      .loading {
-        text-align: center;
-        font-size: 1.5rem;
-        color: #666;
-        padding: 20px;
-      }
-  
-      bbva-button-default {
-        background-color: #ffcc00;
-        color: #fff;
-        border-radius: 5px;
-        padding: 10px 15px;
-        font-weight: bold;
-        transition: background-color 0.3s;
-      }
-  
-      bbva-button-default:hover {
-        background-color: #ffb300; /* Efecto hover en el botón */
-      }
-    `;
-  }
-
   render() {
-    if (this.loading) {
-      return html`<div class="loading">Cargando Pokémon...</div>`;
-    }
-
     return html`
-      <bbva-type-text class="title" text="Lista de Pokemones"></bbva-type-text>
-      <div class="card-container">
-        ${this.pokemonData.length === 0 
-          ? html`<div>No se encontraron Pokémon.</div>` 
-          : this.pokemonData.map(pokemon => html`
-            <div class="card">
-              <h3>${pokemon.nombre}</h3>
-              <img src="${pokemon.imagen}" alt="${pokemon.nombre}">
-              <p>Tipos: ${pokemon.tipos}</p>
-              <bbva-button-default text="Evoluciones"></bbva-button-default>
-            </div>
-          `)}
-      </div>
+    <div class="main-container">
+      ${this.loading 
+        ? html` 
+          <div class="bbva-spinner">
+            <bbva-spinner with-mask=""></bbva-spinner>
+          </div>`
+        : html`
+          <bbva-type-text class="title" text="${this.t("pokemon-title")}"></bbva-type-text>
+          <div class="card-container">
+            ${this.pokemonData.length === 0
+              ? html`<div>No se encontraron Pokémon.</div>`
+              : this.pokemonData.map(pokemon => html`
+                  <div class="card">
+                    <h3>${pokemon.nombre}</h3>
+                    <img src="${pokemon.imagen}" alt="${pokemon.nombre}">
+                    <p>Tipos: ${pokemon.tipos}</p>
+                    <bbva-button-default text="Evoluciones"></bbva-button-default>
+                  </div>
+                `)}
+          </div>
+        `}
+    </div>
     `;
-  }
-}
 
-customElements.define('pokemones-ui', PokemonesUi);
+  }
+  
+
+}
