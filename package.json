@@ -22,6 +22,7 @@
     "@bbva-web-components/bbva-core-lit-helpers": "^1.0.0",
     "@bbva-web-components/bbva-foundations-styles": "^2.0.0",
     "@bbva-web-components/bbva-spinner": "^3.8.2",
+    "@pokedex/pokemones-dm":"git@github.com:PaulaBlanco2/pokemon-UI.git#main",
     "lit-element": "^2.0.0",
     "lit-html": "^1.0.0"
   },
