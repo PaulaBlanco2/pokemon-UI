@@ -1,77 +1,54 @@
-import { LitElement, html } from 'lit-element';
-import { getComponentSharedStyles } from '@bbva-web-components/bbva-core-lit-helpers';
-import styles from './pokemones-ui.css.js';
+import { CellsPage } from '@cells/cells-page';
+import { html } from 'lit-element';
+import '../../../pokemones-ui/src/PokemonesUi.js';
+import '../../../pokemones-dm/src/PokemonesDm.js';
 import '@bbva-experience-components/bbva-button-default/bbva-button-default.js';
-import '@bbva-experience-components/bbva-type-text/bbva-type-text.js';
-import '@bbva-web-components/bbva-spinner/bbva-spinner.js';
-import { BbvaCoreIntlMixin } from '@bbva-web-components/bbva-core-intl-mixin';
-import '@pokedex/pokemones-dm/pokemones-dm.js';
 
-export class PokemonesUi extends BbvaCoreIntlMixin(LitElement) {
-  static get properties() {
-    return {
-      active: { type: Boolean },
-      pokemonData: { type: Array },
-      loading: { type: Boolean },
-    };
+class PokemonesPage extends CellsPage {
+  static get is() {
+    return 'pokemones-page';
   }
 
   constructor() {
     super();
-    this.active = true;
-    this.pokemonData = [];
-    this.loading = true;
-  }
-
-  static get styles() {
-    return [
-      styles,
-      getComponentSharedStyles('pokemones-ui-shared-styles'),
-    ];
-  }
-
-  firstUpdated() {
-    this.addEventListener('pokemon-data-loaded', (e) => {
-      this.pokemonData = e.detail; // Actualiza los datos de Pokémon
-      this.loading = false; // Actualiza el estado de carga
-    });
+    this.selectedPokemon = null;
   }
 
   render() {
     return html`
       <div class="main-container">
-        ${this.loading 
-          ? html` 
-            <div class="bbva-spinner">
-              <bbva-spinner with-mask=""></bbva-spinner>
-            </div>`
-          : html`
-            <bbva-type-text class="title" text="${this.t("pokemon-title")}"></bbva-type-text>
-            <div class="card-container">
-              ${this.pokemonData.length === 0
-                ? html`<div>No se encontraron Pokémon.</div>`
-                : this.pokemonData.map(pokemon => html`
-                    <div class="card">
-                      <h3>${pokemon.nombre}</h3>
-                      <img src="${pokemon.imagen}" alt="${pokemon.nombre}">
-                      <p>Tipos: ${pokemon.tipos}</p>
-                      <bbva-button-default text="Evoluciones" @click="${() => this.goToEvolution(pokemon.nombre)}"></bbva-button-default>
-                    </div>
-                  `)}
+        ${this.pokemonData.map(
+          (pokemon) => html`
+            <div class="card">
+              <h3>${pokemon.nombre}</h3>
+              <img src="${pokemon.imagen}" alt="${pokemon.nombre}">
+              <p>Tipos: ${pokemon.tipos}</p>
+              <bbva-button-default
+                text="Evoluciones"
+                @click="${() => this.dispatchEvent(new CustomEvent('show-evolutions', { detail: { pokemon }, bubbles: true, composed: true }))}">
+              </bbva-button-default>
             </div>
-          `}
+          `
+        )}
       </div>
-      <pokemones-dm></pokemones-dm>
     `;
   }
+  
 
-  goToEvolution(nombre) {
-    this.dispatchEvent(new CustomEvent('pokemon-selected', {
-      detail: { nombre },
-      bubbles: true,
-      composed: true
-    }));
+  handleShowEvolutions(event) {
+    const pokemon = event.detail.pokemon;
+    const evolutions = this.getEvolutions(pokemon);
+    this.goToEvolution(evolutions);
   }
 
+  getEvolutions(pokemon) {
+    return [`${pokemon.nombre} Evolución 1`, `${pokemon.nombre} Evolución 2`];
+  }
+
+  goToEvolution(evolutions) {
+    this.publish('evolutions-channel', { detail: evolutions });
+    this.navigate('evoluciones');
+  }
 }
 
+window.customElements.define(PokemonesPage.is, PokemonesPage);
