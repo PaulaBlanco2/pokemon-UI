@@ -55,7 +55,7 @@ export class PokemonesUi extends BbvaCoreIntlMixin(LitElement) {
                       <h3>${pokemon.nombre}</h3>
                       <img src="${pokemon.imagen}" alt="${pokemon.nombre}">
                       <p>Tipos: ${pokemon.tipos}</p>
-                      <bbva-button-default text="Evoluciones"></bbva-button-default>
+                      <bbva-button-default text="Evoluciones" @click="${() => this.goToEvolution(pokemon.nombre)}"></bbva-button-default>
                     </div>
                   `)}
             </div>
@@ -64,5 +64,14 @@ export class PokemonesUi extends BbvaCoreIntlMixin(LitElement) {
       <pokemones-dm></pokemones-dm>
     `;
   }
+
+  goToEvolution(nombre) {
+    this.dispatchEvent(new CustomEvent('pokemon-selected', {
+      detail: { nombre },
+      bubbles: true,
+      composed: true
+    }));
+  }
+
 }
 
