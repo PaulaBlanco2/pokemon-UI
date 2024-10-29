@@ -32,8 +32,8 @@ export class PokemonesUi extends BbvaCoreIntlMixin(LitElement) {
 
   firstUpdated() {
     this.addEventListener('pokemon-data-loaded', (e) => {
-      this.pokemonData = e.detail; 
-      this.loading = false; 
+      this.pokemonData = e.detail; // Actualiza los datos de Pokémon
+      this.loading = false; // Actualiza el estado de carga
     });
   }
 
@@ -55,7 +55,7 @@ export class PokemonesUi extends BbvaCoreIntlMixin(LitElement) {
                       <h3>${pokemon.nombre}</h3>
                       <img src="${pokemon.imagen}" alt="${pokemon.nombre}">
                       <p>Tipos: ${pokemon.tipos}</p>
-                      <bbva-button-default text="Evoluciones" @click="${() => this.navigateToEvolutions(pokemon.id)}"></bbva-button-default>
+                      <bbva-button-default text="Evoluciones"></bbva-button-default>
                     </div>
                   `)}
             </div>
@@ -63,9 +63,5 @@ export class PokemonesUi extends BbvaCoreIntlMixin(LitElement) {
       </div>
       <pokemones-dm></pokemones-dm>
     `;
-  }
-
-  navigateToEvolutions(pokemonId) {
-    this.dispatchEvent(new CustomEvent('navigate', { detail: { path: `/evoluciones/${pokemonId}` }, bubbles: true, composed: true }));
   }
 }
